@@ -4,6 +4,7 @@ import { Car, drawCar, removeCar } from './utils/car'
 import { Coin } from './utils/coin'
 import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH } from './utils/constants'
 import { Mushroom } from './utils/mushroom'
+import { Progress } from './utils/progressbar'
 const app = new PIXI.Application({
   width: BASE_WIDTH,
   height: BASE_HEIGHT,
@@ -19,21 +20,23 @@ drawBackgroundRectangles(app)
 
 const style = new PIXI.TextStyle({
   fontFamily: 'Arial',
-  fontSize: 24,
+  fontSize: 18,
   fontWeight: 'bold',
-  fill: '#000000', 
-});
+  fill: '#000000'
+})
 
-const coinsText = new PIXI.Text(`монеток: 0` , style);
-coinsText.x = 50;
-coinsText.y = 50;
+let progress = new Progress(app, 25, 60, 100)
 
-const scoreText = new PIXI.Text(`Очков: 0` , style);
-scoreText.x = 50;
-scoreText.y = 90;
-const levelText = new PIXI.Text(`уровень: 0` , style);
-levelText.x = 50;
-levelText.y = 130;
+const coinsText = new PIXI.Text(`coins: 0`, style)
+coinsText.x = 50
+coinsText.y = 50
+
+const scoreText = new PIXI.Text(`score: 0`, style)
+scoreText.x = 50
+scoreText.y = 70
+const levelText = new PIXI.Text(`level: 0`, style)
+levelText.x = 50
+levelText.y = 90
 
 function checkForCollision(a, b, offsetY) {
   let aBox = a.getBounds()
@@ -56,7 +59,6 @@ let mushrooms = []
 
 let speed = BASE_SPEED
 
-
 ticker.add((delta) => {
   if (!enemies.length) {
     const enemy = new Car(app, Math.random() > 0.5 ? 42 : BASE_WIDTH - 300, -120, speed)
@@ -65,9 +67,10 @@ ticker.add((delta) => {
 
   enemies = enemies.filter((enemy) => {
     enemy.update(delta)
-    
+
     if (enemy.root.y > BASE_HEIGHT) {
       enemy.destroy()
+      scoreCount += 100
       return false
     }
     return true
@@ -94,10 +97,10 @@ ticker.add((delta) => {
   if (enemies[enemies.length - 1].root.y - 220 >= 0) {
     const isLeft = Math.random() > 0.5
     const enemy = new Car(app, isLeft ? 42 : BASE_WIDTH - 300, -180, speed)
-    if (Math.random() < 0.4) {
+    if (Math.random() < 0.5) {
       const coin = new Coin(app, enemy.root.x + 10, enemy.root.y - 160, speed)
       coins.push(coin)
-    } else if (Math.random() < 0.9) {
+    } else if (Math.random() < 0.1) {
       const mushroom = new Mushroom(app, enemy.root.x + 5, enemy.root.y - 160, speed)
       mushrooms.push(mushroom)
     }
@@ -106,59 +109,79 @@ ticker.add((delta) => {
   }
 
   enemies.some((enemy) => {
-    if (checkForCollision(enemy.root, hero.root, 20) && hero.isCollision) {
-      ticker.stop()
-      window.removeEventListener('keydown', handleKeyPress)
-        return true
-    }
-  })
-
-  mushrooms.some((mushroom) => {
-    if (checkForCollision(mushroom.root, hero.root, 20) && hero.isCollision) {
-      mushroom.destroy()
-      speed += 50
-      
-      mushrooms = mushrooms.filter(el => el !== mushroom)
-      hero.upscale()
-      enemies.forEach(enemy => enemy.incrementSpeed(speed))
-      coins.forEach(coin => coin.incrementSpeed(speed))
-      mushrooms.forEach(mushroom => mushroom.incrementSpeed(speed))
-      window.removeEventListener('keydown', handleKeyPress)
-      setInterval(() => {
-        scoreCount +=50
-      }, delta)
-      setTimeout(() => {
+    if (checkForCollision(enemy.root, hero.root, 20)) {
+      if (hero.isCollision) {
+        hero.root.alpha = 0
+        progress = null
+        ticker.stop()
         window.removeEventListener('keydown', handleKeyPress)
-      }, 2000)
-      return false
+      } else {
+        enemy.destroy()
+        enemies = enemies.filter((enemyItem) => enemyItem !== enemy)
+        scoreCount += 100
+      }
+      return true
     }
   })
 
   coins.some((coin) => {
-    if (checkForCollision(coin.root, hero.root, 20) && hero.isCollision) {
+    if (checkForCollision(coin.root, hero.root, 20)) {
       coin.destroy()
-      coins = coins.filter(el => el !== coin)
+      coins = coins.filter((el) => el !== coin)
       coinsCount++
-      coinsText.text = `монеток: ${coinsCount}`
+      scoreCount += 20
+      coinsText.text = `coins: ${coinsCount}`
       return false
     }
   })
-  scoreCount++
-  scoreText.text = `очков: ${scoreCount}`
+  scoreText.text = `score: ${scoreCount}`
 
-   if (scoreCount === prevCount + 1000) {
-      prevCount = scoreCount
-      level+=1
-      speed+=4
-      enemies.forEach(enemy => enemy.incrementSpeed(speed))
-      coins.forEach(coin => coin.incrementSpeed(speed))
-      levelText.text = `уровень: ${level}`
+  if (scoreCount >= prevCount + 2500) {
+    prevCount = scoreCount
+    level += 1
+    speed += 2
+    enemies.forEach((enemy) => enemy.incrementSpeed(speed))
+    coins.forEach((coin) => coin.incrementSpeed(speed))
+    mushrooms.forEach((mushroom) => mushroom.incrementSpeed(speed))
+
+    levelText.text = `level: ${level}`
   }
 
-  app.stage.addChild  (coinsText);
-  app.stage.addChild(scoreText);
-  app.stage.addChild(levelText);
+  mushrooms.some((mushroom) => {
+    if (checkForCollision(mushroom.root, hero.root, 20)) {
+      if (hero.isCollision) {
+        mushroom.destroy()
+        mushrooms = mushrooms.filter((el) => el !== mushroom)
+        if (progress) {
+          progress.draw()
+        }
+        hero.upscale()
+        let progressInterval = setInterval(() => {
+          if (progress) {
+            progress.update(1, delta)
+          }
+        }, 100)
+        setTimeout(() => {
+          clearInterval(progressInterval)
+          hero.reset()
+          progress.destroy()
+          progress = new Progress(app, 25, 60, 100)
+        }, 10000)
+      } else {
+        mushroom.destroy()
+        mushrooms = mushrooms.filter((el) => el !== mushroom)
+      }
+      return false
+    }
+  })
+
+  app.stage.addChild(coinsText)
+  app.stage.addChild(scoreText)
+  app.stage.addChild(levelText)
   hero.recreate()
+  if (progress) {
+    progress.recreate()
+  }
 })
 
 ticker.start()
@@ -171,8 +194,6 @@ const handleKeyPress = (e) => {
     hero.setLeft()
   }
 }
-
-
 
 window.addEventListener('keydown', handleKeyPress)
 
