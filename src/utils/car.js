@@ -7,6 +7,7 @@ export class Car {
     this.root.x = x
     this.root.y = y
     this.speed = speed
+    this.isCollision = true
     this.app = app
     for (let i = 0; i < CAR_FIGURE.length; i++) {
       for (let j = 0; j <= CAR_FIGURE[i].length; j++) {
@@ -34,6 +35,22 @@ export class Car {
 
   setLeft(value) {
     this.root.x = 42
+  }
+
+  upscale() {
+    this.isCollision = false
+    setTimeout(() => {
+      this.root.scale.set(1.2,1.2)
+    }, 100);
+    setTimeout(() => {
+      this.root.scale.set(1.5,1.5)
+    }, 250);
+    this.root.x = this.root.x / 3.5
+  }
+
+  recreate() {
+    this.app.stage.removeChild(this.root)
+    this.app.stage.addChild(this.root)
   }
 
   update(dt) {
