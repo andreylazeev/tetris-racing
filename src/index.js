@@ -9,7 +9,28 @@ const app = new PIXI.Application({
   backgroundColor: 0xb2beb2,
   resolution: window.devicePixelRatio || 1
 })
+
+let coinsCount = 0
+let scoreCount = 0
 drawBackgroundRectangles(app)
+
+const style = new PIXI.TextStyle({
+  fontFamily: 'Arial',
+  fontSize: 24,
+  fontWeight: 'bold',
+  fill: '#000000', 
+});
+
+const coinsText = new PIXI.Text(`монеток: 0` , style);
+coinsText.x = 50;
+coinsText.y = 50;
+
+const scoreText = new PIXI.Text(`Очков: 0` , style);
+scoreText.x = 50;
+scoreText.y = 90;
+
+app.stage.addChild(coinsText);
+app.stage.addChild(scoreText);
 
 function checkForCollision(a, b, offsetY) {
   let aBox = a.getBounds()
@@ -28,7 +49,6 @@ const hero = new Car(app, 42, BASE_HEIGHT - 220, false)
 let enemies = []
 let coins = []
 
-let score = 0
 
 ticker.add((delta) => {
   if (!enemies.length) {
@@ -79,11 +99,13 @@ ticker.add((delta) => {
     if (checkForCollision(coin.root, hero.root, 20)) {
       coin.destroy()
       coins = coins.filter(el => el !== coin)
-      score++
-      console.log(score);
+      coinsCount++
+      coinsText.text = `монеток: ${coinsCount}`
       return false
     }
   })
+  scoreCount++
+  scoreText.text = `очков: ${scoreCount}`
 })
 
 ticker.start()
@@ -96,6 +118,8 @@ const handleKeyPress = (e) => {
     hero.setLeft()
   }
 }
+
+
 
 window.addEventListener('keydown', handleKeyPress)
 

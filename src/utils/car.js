@@ -46,6 +46,6 @@ export class Car {
   }
 
   setRight(value) {
-    this.root.x = 162
+    this.root.x = BASE_WIDTH - 240
   }
 }
