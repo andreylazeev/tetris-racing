@@ -1,6 +1,6 @@
 export const BASE_WIDTH = 400
 export const BASE_HEIGHT = 720
-export const BASE_SPEED = 5
+export const BASE_SPEED = 8
 
 export const CAR_FIGURE = [
   [0,1,0],

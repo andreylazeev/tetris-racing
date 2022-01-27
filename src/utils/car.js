@@ -2,11 +2,11 @@ import { Graphics } from 'pixi.js'
 import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, CAR_FIGURE } from './constants'
 
 export class Car {
-  constructor(app, x, y, isEnemy) {
+  constructor(app, x, y, speed) {
     this.root = new Graphics()
     this.root.x = x
     this.root.y = y
-    this.isEnemy = isEnemy
+    this.speed = speed
     this.app = app
     for (let i = 0; i < CAR_FIGURE.length; i++) {
       for (let j = 0; j <= CAR_FIGURE[i].length; j++) {
@@ -37,8 +37,12 @@ export class Car {
   }
 
   update(dt) {
-    const SPEED = BASE_SPEED * dt
+    const SPEED = this.speed * dt
     this.root.y += SPEED
+  }
+
+  incrementSpeed (speed) {
+    this.speed = speed
   }
 
   destroy() {

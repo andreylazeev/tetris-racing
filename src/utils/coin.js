@@ -2,11 +2,11 @@ import { Graphics } from 'pixi.js'
 import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, COIN_FIGURE } from './constants'
 
 export class Coin {
-  constructor(app, x, y, isEnemy) {
+  constructor(app, x, y, speed) {
     this.root = new Graphics()
     this.root.x = x
     this.root.y = y
-    this.isEnemy = isEnemy
+    this.speed = speed
     this.app = app
     for (let i = 0; i < COIN_FIGURE.length; i++) {
       for (let j = 0; j <= COIN_FIGURE[i].length; j++) {
@@ -32,8 +32,11 @@ export class Coin {
   }
 
   update(dt) {
-    const SPEED = BASE_SPEED * dt
+    const SPEED = this.speed * dt
     this.root.y += SPEED
+  }
+  incrementSpeed (speed) {
+    this.speed = speed
   }
 
   destroy() {
