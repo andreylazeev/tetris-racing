@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js'
-import { BASE_HEIGHT, BASE_WIDTH, CAR_FIGURE } from './constants'
+import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, CAR_FIGURE } from './constants'
 
 export class Car {
   constructor(app, x, y, isEnemy) {
@@ -33,11 +33,11 @@ export class Car {
   }
 
   setLeft(value) {
-    this.root.x = 40
+    this.root.x = 42
   }
 
   update(dt) {
-    const SPEED = 5 * dt
+    const SPEED = BASE_SPEED * dt
     this.root.y += SPEED
   }
 
@@ -46,6 +46,6 @@ export class Car {
   }
 
   setRight(value) {
-    this.root.x = 160
+    this.root.x = 162
   }
 }
