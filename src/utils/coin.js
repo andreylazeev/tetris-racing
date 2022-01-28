@@ -63,7 +63,6 @@ export class Coin {
           motion = 1;
         }
       }
-      // this.root.scale.set(scale, scale);
     })
 
     app.ticker.start()

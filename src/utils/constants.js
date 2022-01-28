@@ -9,6 +9,12 @@ export const CAR_FIGURE = [
   [1, 0, 1]
 ]
 
+export const WALL_FIGURE = [
+  [1],
+  [1],
+  [1],
+]
+
 export const COIN_FIGURE = [
   [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
   [0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0],
