@@ -13,18 +13,60 @@ export class Coin {
         if (COIN_FIGURE[i][j] === 1) {
           this.root.beginFill(0x000000)
           this.root.lineStyle(1, 0xb2beb2, 1)
-          this.root.drawRect(this.root.x + j * 8, i * 8, 8, 8)
+          this.root.drawRect(this.root.x + j * 6, i * 7, 6, 7)
           this.root.endFill()
-          // for (let x = 0; x < 12; x += 4) {
-          //   for (let y = 0; y < 12; y += 4) {
-          //     this.root.drawRect(this.root.x + j * 16 + (4 + x), i * 18 + (6 + y), 4, 4)
-          //   }
-          // }
-          // this.root.endFill()
         }
       }
     }
     app.stage.addChild(this.root)
+
+    let scale = 1,
+      motion = 1;
+
+    app.ticker.add((delta) => {
+      if (motion == 1) {
+        if (scale < 3) {
+          scale += 0.1;
+          setTimeout(() => {
+            this.root.clear()
+            for (let i = 0; i < COIN_FIGURE.length; i++) {
+              for (let j = 0; j <= COIN_FIGURE[i].length; j++) {
+                if (COIN_FIGURE[i][j] === 1) {
+                  this.root.beginFill(0x000000)
+                  this.root.lineStyle(1, 0xb2beb2, 1)
+                  this.root.drawRect(this.root.x + j * 6, i * 7, 6, 7)
+                  this.root.endFill()
+                }
+              }
+            }
+          }, 500);
+        } else {
+          motion = 0;
+        }
+      } else {
+        if (scale > 1) {
+          scale -= 0.1;
+          setTimeout(() => {
+            this.root.clear()
+            for (let i = 0; i < COIN_FIGURE.length; i++) {
+              for (let j = 0; j <= COIN_FIGURE[i].length; j++) {
+                if (COIN_FIGURE[i][j] === 1) {
+                  this.root.beginFill(0x000000)
+                  this.root.lineStyle(1, 0xb2beb2, 1)
+                  this.root.drawRect(this.root.x + 5 + (j * 5), (i * 6) + 6 + 1, 5, 6)
+                  this.root.endFill()
+                }
+              }
+            }
+          }, 500);
+        } else {
+          motion = 1;
+        }
+      }
+      // this.root.scale.set(scale, scale);
+    })
+
+    app.ticker.start()
   }
 
   setLeft(value) {
@@ -35,7 +77,7 @@ export class Coin {
     const SPEED = this.speed * dt
     this.root.y += SPEED
   }
-  incrementSpeed (speed) {
+  incrementSpeed(speed) {
     this.speed = speed
   }
 

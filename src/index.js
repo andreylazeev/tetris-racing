@@ -111,7 +111,6 @@ ticker.add((delta) => {
   enemies.some((enemy) => {
     if (checkForCollision(enemy.root, hero.root, 20)) {
       if (hero.isCollision) {
-        hero.root.alpha = 0
         progress = null
         ticker.stop()
         window.removeEventListener('keydown', handleKeyPress)
