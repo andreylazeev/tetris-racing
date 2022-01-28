@@ -82,10 +82,6 @@ ticker.add((delta) => {
       walls.push(wall2)
     }
 
-    // walls.forEach(wall => {
-    //   wall.update(delta/ 50)
-    // })
-    
     walls.forEach((wall) => {
       if (walls[walls.length - 1].root.y + walls[walls.length - 1].root.height <= BASE_HEIGHT) {
         const wall = new Wall(app,2,walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,1)
@@ -93,12 +89,6 @@ ticker.add((delta) => {
         walls.push(wall)
         walls.push(wall2)
       }
-
-      // if (wall.root.y > 12) {
-      //   wall.destroy()
-      //   walls = walls.filter(oldWall => oldWall !== wall)
-      //   console.log(111);
-      // }
     })
 
     enemies = enemies.filter((enemy) => {
@@ -136,7 +126,7 @@ ticker.add((delta) => {
       if (Math.random() < 0.5) {
         const coin = new Coin(app, enemy.root.x + 10, enemy.root.y - 160, speed)
         coins.push(coin)
-      } else if (Math.random() < 0.99) {
+      } else if (Math.random() < 0.1) {
         const mushroom = new Mushroom(app, enemy.root.x + 5, enemy.root.y - 160, speed)
         mushrooms.push(mushroom)
       }

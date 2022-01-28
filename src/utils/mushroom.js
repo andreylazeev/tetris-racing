@@ -15,12 +15,6 @@ export class Mushroom {
           this.root.lineStyle(1, 0xb2beb2, 1)
           this.root.drawRect(this.root.x + j * 6, i * 7, 6, 7)
           this.root.endFill()
-          // for (let x = 0; x < 12; x += 4) {
-          //   for (let y = 0; y < 12; y += 4) {
-          //     this.root.drawRect(this.root.x + j * 16 + (4 + x), i * 18 + (6 + y), 4, 4)
-          //   }
-          // }
-          // this.root.endFill()
         }
       }
     }
