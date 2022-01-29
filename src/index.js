@@ -6,6 +6,7 @@ import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH } from './utils/constants'
 import { Menu } from './utils/menu'
 import { Mushroom } from './utils/mushroom'
 import { Progress } from './utils/progressbar'
+import { Ticker } from './utils/ticker'
 import { Wall } from './utils/wall'
 const app = new PIXI.Application({
   width: BASE_WIDTH,
@@ -53,12 +54,14 @@ function checkForCollision(a, b, offsetY) {
 }
 
 const ticker = new PIXI.Ticker()
-let hero = new Car(app, 42, BASE_HEIGHT - 240, 0)
+let hero = new Car(app, 42, BASE_HEIGHT - 240, 0, true)
 
 let enemies = []
 let coins = []
 let mushrooms = []
 let walls = []
+let time = 0
+let upscaleTime = 0
 
 let speed = BASE_SPEED
 
@@ -70,34 +73,84 @@ menu.root.on('mousedown', () => {
 })
 ticker.add((delta) => {
   if (menu.isStarted) {
+    time = time + (1 / 60) * delta
+
+    hero.update(delta)
     if (!enemies.length) {
       const enemy = new Car(app, Math.random() > 0.5 ? 42 : BASE_WIDTH - 300, -120, speed)
       enemies.push(enemy)
     }
 
     if (!walls.length) {
-      const wall = new Wall(app,2,4,1)
-      const wall2 = new Wall(app,182,4,1)
+      const wall = new Wall(app, 2, 4, 1)
+      const wall2 = new Wall(app, 182, 4, 1)
       walls.push(wall)
       walls.push(wall2)
     }
 
     walls.forEach((wall) => {
       if (walls[walls.length - 1].root.y + walls[walls.length - 1].root.height <= BASE_HEIGHT) {
-        const wall = new Wall(app,2,walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,1)
-        const wall2 = new Wall(app,182,walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,1)
+        const wall = new Wall(
+          app,
+          2,
+          walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,
+          1
+        )
+        const wall2 = new Wall(
+          app,
+          182,
+          walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,
+          1
+        )
         walls.push(wall)
         walls.push(wall2)
       }
+      wall.update()
     })
 
     enemies = enemies.filter((enemy) => {
       enemy.update(delta)
-
+      enemy.incrementSpeed(speed)
       if (enemy.root.y > BASE_HEIGHT) {
         enemy.destroy()
         scoreCount += 100
         return false
+      }
+
+      if (checkForCollision(enemy.root, hero.root, 20)) {
+        if (hero.isCollision) {
+          ticker.stop()
+          menu.isStarted = false
+          progress.destroy()
+          menu = new Menu(app, 0, 0, 'click to restart')
+          hero.destroy()
+          menu.root.on('mousedown', () => {
+            menu.destroy()
+            menu.isStarted = true
+            hero = new Car(app, 42, BASE_HEIGHT - 240, 0, true)
+            enemies.forEach((enemy) => enemy.destroy())
+            coins.forEach((coin) => coin.destroy())
+            mushrooms.forEach((mushroom) => mushroom.destroy())
+            walls.forEach((wall) => wall.destroy())
+            coinsCount = 0
+            scoreCount = 0
+            level = 0
+            speed = BASE_SPEED
+            enemies = []
+            coins = []
+            mushrooms = []
+            walls = []
+            coinsText.text = `coins: 0`
+            scoreText.text = `score: 0`
+            levelText.text = `lap: 0`
+            ticker.start()
+          })
+        } else {
+          enemy.destroy()
+          enemies = enemies.filter((enemyItem) => enemyItem !== enemy)
+          scoreCount += 100
+        }
+        return true
       }
       return true
     })
@@ -134,45 +187,6 @@ ticker.add((delta) => {
       return true
     }
 
-    enemies.some((enemy) => {
-      if (checkForCollision(enemy.root, hero.root, 20)) {
-        if (hero.isCollision) {
-          ticker.stop()
-          menu.isStarted = false
-          progress.destroy()
-          menu = new Menu(app, 0, 0, 'click to restart')
-          hero.destroy()
-          menu.root.on('mousedown', () => {
-            menu.destroy()
-            menu.isStarted = true
-            hero = new Car(app, 42, BASE_HEIGHT - 240, 0)
-            enemies.forEach((enemy) => enemy.destroy())
-            coins.forEach((coin) => coin.destroy())
-            mushrooms.forEach((mushroom) => mushroom.destroy())
-            walls.forEach((wall) => wall.destroy())
-            coinsCount = 0
-            scoreCount = 0
-            level = 0
-            speed = BASE_SPEED
-            enemies = []
-            coins = []
-            mushrooms = []
-            walls = []
-
-            coinsText.text = `coins: 0`
-            scoreText.text = `score: 0`
-            levelText.text = `lap: 0`
-            ticker.start()
-          })
-        } else {
-          enemy.destroy()
-          enemies = enemies.filter((enemyItem) => enemyItem !== enemy)
-          scoreCount += 100
-        }
-        return true
-      }
-    })
-
     coins.some((coin) => {
       if (checkForCollision(coin.root, hero.root, 20)) {
         coin.destroy()
@@ -182,6 +196,7 @@ ticker.add((delta) => {
         coinsText.text = `coins: ${coinsCount}`
         return false
       }
+      coin.incrementSpeed(speed)
     })
     scoreText.text = `score: ${scoreCount}`
 
@@ -189,36 +204,32 @@ ticker.add((delta) => {
       prevCount = scoreCount
       level += 1
       speed += 2
-      enemies.forEach((enemy) => enemy.incrementSpeed(speed))
-      coins.forEach((coin) => coin.incrementSpeed(speed))
-      mushrooms.forEach((mushroom) => mushroom.incrementSpeed(speed))
-
       levelText.text = `lap: ${level}`
     }
-
-    mushrooms.some((mushroom) => {
+    mushrooms.filter((mushroom) => {
+      mushroom.incrementSpeed(speed)
       if (checkForCollision(mushroom.root, hero.root, 20)) {
         if (hero.isCollision) {
           mushroom.destroy()
-          mushrooms = mushrooms.filter((el) => el !== mushroom)
-          progress.draw()
-          hero.upscale()
-          let progressInterval = setInterval(() => {
-            progress.update(1, delta)
-          }, 100)
-          setTimeout(() => {
-            clearInterval(progressInterval)
-            hero.reset()
-            progress.destroy()
-            progress = new Progress(app, 25, 60, 100)
-          }, 10000)
+          hero.upscale()          
+          return true
         } else {
+          progress.restart()
           mushroom.destroy()
-          mushrooms = mushrooms.filter((el) => el !== mushroom)
+          if (hero.isBig) {
+            upscaleTime = 0
+          }
+          checkUpscale(delta)
+          return false
         }
-        return false
       }
     })
+
+    if (hero.isBig) {
+      checkUpscale(delta)
+      console.log(hero.isBig);
+    }
+
 
     app.stage.addChild(coinsText)
     app.stage.addChild(scoreText)
@@ -227,6 +238,9 @@ ticker.add((delta) => {
     if (!menu.isStarted) {
       menu.recreate()
     }
+    if (progress.isVisible) {
+      progress.update()
+    }
     if (progress) {
       progress.recreate()
     }
@@ -234,6 +248,24 @@ ticker.add((delta) => {
 })
 
 ticker.start()
+
+const checkUpscale = (delta) => {
+  upscaleTime = upscaleTime + (1 / 60) * delta
+  console.log(upscaleTime);
+  if (!progress.isVisible) {
+    progress.draw()
+  }
+  if (!hero.isBig) {
+    hero.upscale()
+  }
+  if (Math.trunc(upscaleTime) === 10) {
+    console.log('destroy')
+    hero.reset()
+    progress.destroy()
+    progress = new Progress(app, 25, 60, 100)
+    upscaleTime = 0
+  }
+}
 
 const handleKeyPress = (e) => {
   if (e.key === 'ArrowRight') {
