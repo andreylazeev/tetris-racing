@@ -2,16 +2,17 @@ import * as PIXI from 'pixi.js'
 import { drawBackgroundRectangles } from './utils/background'
 import { Car, drawCar, removeCar } from './utils/car'
 import { Coin } from './utils/coin'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH } from './utils/constants'
+import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, calcCells, CELL_SIZE, SEPARATOR, SEPATATOR } from './utils/constants'
 import { Menu } from './utils/menu'
 import { Mushroom } from './utils/mushroom'
 import { Progress } from './utils/progressbar'
 import { Wall } from './utils/wall'
+import { randomBool } from './utils/random'
+import { Container, Graphics } from 'pixi.js'
 const app = new PIXI.Application({
   width: BASE_WIDTH,
   height: BASE_HEIGHT,
-  backgroundColor: 0xb2beb2,
-  resolution: window.devicePixelRatio || 1
+  backgroundColor: 0xb2beb2
 })
 drawBackgroundRectangles(app)
 
@@ -52,9 +53,9 @@ function checkForCollision(a, b, offsetY) {
   )
 }
 
-const ticker = new PIXI.Ticker()
-let hero = new Car(app, 42, BASE_HEIGHT - 240, 0, true)
+let hero
 
+let speed = BASE_SPEED
 let enemies = []
 let coins = []
 let mushrooms = []
@@ -62,45 +63,62 @@ let walls = []
 let time = 0
 let upscaleTime = 0
 
-let speed = BASE_SPEED
+const ticker = new PIXI.Ticker()
 
+const liveLayer = new Container()
+app.stage.addChild(liveLayer)
+
+function createHero() {
+  hero = new Car(liveLayer, true, true)
+}
+createHero()
 let menu = new Menu(app, 0, 0, 'click to start')
 
 menu.root.on('mousedown', () => {
   menu.destroy()
   menu.isStarted = true
 })
+
+function createEnemy() {
+  const isLeft = randomBool()
+  const enemy = new Car(liveLayer, isLeft)
+  enemy.speed = speed
+  enemies.push(enemy)
+  return enemy
+}
+function createCoin(isLeft) {
+  const coin = new Coin(liveLayer, isLeft)
+  coin.speed = speed
+  coins.push(coin)
+  return coin
+}
+function createMushroom(isLeft) {
+  const mushroom = new Mushroom(liveLayer, isLeft)
+  mushroom.speed = speed
+  mushrooms.push(mushroom)
+  return mushroom
+}
+
 ticker.add((delta) => {
   if (menu.isStarted) {
     time = time + (1 / 60) * delta
 
     hero.update(delta)
     if (!enemies.length) {
-      const enemy = new Car(app, Math.random() > 0.5 ? 42 : BASE_WIDTH - 300, -120, speed)
-      enemies.push(enemy)
+      createEnemy()
     }
 
     if (!walls.length) {
-      const wall = new Wall(app, 2, 4, 1)
-      const wall2 = new Wall(app, 182, 4, 1)
+      const wall = new Wall(app, 0, 0, 1)
+      const wall2 = new Wall(app, BASE_WIDTH - calcCells(1), 0, 1)
       walls.push(wall)
       walls.push(wall2)
     }
 
     walls.forEach((wall) => {
       if (walls[walls.length - 1].root.y + walls[walls.length - 1].root.height <= BASE_HEIGHT) {
-        const wall = new Wall(
-          app,
-          2,
-          walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,
-          1
-        )
-        const wall2 = new Wall(
-          app,
-          182,
-          walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + 46,
-          1
-        )
+        const wall = new Wall(app,0,walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + calcCells(1) - SEPARATOR,1)
+        const wall2 = new Wall(app,BASE_WIDTH - calcCells(1),walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + calcCells(1) - SEPARATOR,1)
         walls.push(wall)
         walls.push(wall2)
       }
@@ -109,8 +127,7 @@ ticker.add((delta) => {
 
     enemies = enemies.filter((enemy) => {
       enemy.update(delta)
-      enemy.incrementSpeed(speed)
-      if (enemy.root.y > BASE_HEIGHT) {
+      if (enemy.root.y > BASE_HEIGHT + enemy.root.height / 2) {
         enemy.destroy()
         scoreCount += 100
         return false
@@ -119,35 +136,35 @@ ticker.add((delta) => {
       if (checkForCollision(enemy.root, hero.root, 20)) {
         if (hero.isCollision) {
           ticker.stop()
-          menu.isStarted = false
           progress.destroy()
-          menu = new Menu(app, 0, 0, 'click to restart')
           hero.destroy()
+          menu.destroy()
+          menu = new Menu(app, 0, 0, 'click to start')
           menu.root.on('mousedown', () => {
             menu.destroy()
             menu.isStarted = true
-            hero = new Car(app, 42, BASE_HEIGHT - 240, 0, true)
-            enemies.forEach((enemy) => enemy.destroy())
-            coins.forEach((coin) => coin.destroy())
-            mushrooms.forEach((mushroom) => mushroom.destroy())
-            walls.forEach((wall) => wall.destroy())
-            coinsCount = 0
-            scoreCount = 0
-            level = 0
-            speed = BASE_SPEED
-            enemies = []
-            coins = []
-            mushrooms = []
-            walls = []
-            coinsText.text = `coins: 0`
-            scoreText.text = `score: 0`
-            levelText.text = `lap: 0`
-            ticker.start()
           })
+          createHero()
+          enemies.forEach((enemy) => enemy.destroy())
+          coins.forEach((coin) => coin.destroy())
+          mushrooms.forEach((mushroom) => mushroom.destroy())
+          walls.forEach((wall) => wall.destroy())
+          coinsCount = 0
+          scoreCount = 0
+          level = 0
+          speed = BASE_SPEED
+          enemies = []
+          coins = []
+          mushrooms = []
+          walls = []
+          coinsText.text = `coins: 0`
+          scoreText.text = `score: 0`
+          levelText.text = `lap: 0`
+          ticker.start()
         } else {
           enemy.destroy()
-          enemies = enemies.filter((enemyItem) => enemyItem !== enemy)
           scoreCount += 100
+          return false
         }
         return true
       }
@@ -156,14 +173,12 @@ ticker.add((delta) => {
 
     coins = coins.filter((coin) => {
       coin.update(delta)
-      coin.incrementSpeed(speed)
       if (coin.root.y > BASE_HEIGHT) {
         coin.destroy()
         return false
       }
-      if (checkForCollision(coin.root, hero.root, 20)) {
+      if (checkForCollision(coin.root, hero.root, 0)) {
         coin.destroy()
-        coins = coins.filter((el) => el !== coin)
         coinsCount++
         scoreCount += 20
         coinsText.text = `coins: ${coinsCount}`
@@ -174,8 +189,7 @@ ticker.add((delta) => {
 
     mushrooms = mushrooms.filter((mushroom) => {
       mushroom.update(delta)
-      mushroom.incrementSpeed(speed)
-      if (checkForCollision(mushroom.root, hero.root, 20)) {
+      if (checkForCollision(mushroom.root, hero.root, 0)) {
         if (hero.isCollision) {
           mushroom.destroy()
           hero.upscale()
@@ -198,16 +212,13 @@ ticker.add((delta) => {
     })
 
     if (enemies[enemies.length - 1].root.y - 220 >= 0) {
-      const isLeft = Math.random() > 0.5
-      const enemy = new Car(app, isLeft ? 42 : BASE_WIDTH - 300, -180, speed)
-      if (Math.random() < 0.5) {
-        const coin = new Coin(app, enemy.root.x + 10, enemy.root.y - 160, speed)
-        coins.push(coin)
-      } else if (Math.random() < 0.1) {
-        const mushroom = new Mushroom(app, enemy.root.x + 5, enemy.root.y - 160, speed)
-        mushrooms.push(mushroom)
+      const enemy = createEnemy()
+      const random = Math.random()
+      if (random < 0.5) {
+        createCoin(enemy.isLeft)
+      } else if (random < 0.1) {
+        createMushroom(enemy.isLeft)
       }
-      enemies.push(enemy)
       return true
     }
     scoreText.text = `score: ${scoreCount}`
@@ -221,13 +232,11 @@ ticker.add((delta) => {
 
     if (hero.isBig) {
       checkUpscale(delta)
-      console.log(hero.isBig)
     }
 
     app.stage.addChild(coinsText)
     app.stage.addChild(scoreText)
     app.stage.addChild(levelText)
-    hero.recreate()
     if (!menu.isStarted) {
       menu.recreate()
     }
@@ -252,7 +261,6 @@ const checkUpscale = (delta) => {
     hero.upscale()
   }
   if (Math.trunc(upscaleTime) === 10) {
-    console.log('destroy')
     hero.reset()
     progress.destroy()
     progress = new Progress(app, 25, 60, 100)

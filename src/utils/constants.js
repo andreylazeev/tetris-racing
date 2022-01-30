@@ -2,6 +2,13 @@ export const BASE_WIDTH = 400
 export const BASE_HEIGHT = 720
 export const BASE_SPEED = 4
 
+export const CELL_SIZE = 40
+export const SEPARATOR = 6
+
+export function calcCells(count) {
+  return CELL_SIZE * count
+}
+
 export const CAR_FIGURE = [
   [0, 1, 0],
   [1, 1, 1],
