@@ -203,7 +203,7 @@ ticker.add((delta) => {
       if (Math.random() < 0.5) {
         const coin = new Coin(app, enemy.root.x + 10, enemy.root.y - 160, speed)
         coins.push(coin)
-      } else if (Math.random() < 9) {
+      } else if (Math.random() < 0.1) {
         const mushroom = new Mushroom(app, enemy.root.x + 5, enemy.root.y - 160, speed)
         mushrooms.push(mushroom)
       }
