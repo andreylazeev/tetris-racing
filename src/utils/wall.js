@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, WALL_FIGURE } from './constants'
+import { WALL_FIGURE } from './constants'
 import { Ticker } from './ticker'
 
 export class Wall {

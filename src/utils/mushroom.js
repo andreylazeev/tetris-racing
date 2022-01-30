@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, MUSHROOM_FIGURE } from './constants'
+import { MUSHROOM_FIGURE } from './constants'
 
 export class Mushroom {
   constructor(app, x, y, speed) {

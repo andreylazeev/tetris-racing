@@ -1,5 +1,4 @@
 import { Graphics } from 'pixi.js'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, CAR_FIGURE } from './constants'
 import { Ticker } from './ticker'
 
 export class Progress {

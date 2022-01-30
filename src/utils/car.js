@@ -1,5 +1,5 @@
 import { Graphics } from 'pixi.js'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, CAR_FIGURE } from './constants'
+import { BASE_WIDTH, CAR_FIGURE } from './constants'
 import { Ticker } from './ticker'
 
 export class Car {
@@ -12,7 +12,7 @@ export class Car {
     this.isBig = false
     this.app = app
     this.scaleTicker = new Ticker(50)
-    this.alphaTicker = new Ticker(400)
+    this.alphaTicker = new Ticker(450)
     this.isMe = isMe
     for (let i = 0; i < CAR_FIGURE.length; i++) {
       for (let j = 0; j <= CAR_FIGURE[i].length; j++) {

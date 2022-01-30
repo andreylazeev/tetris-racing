@@ -1,5 +1,5 @@
 import { Graphics, Text, TextStyle } from 'pixi.js'
-import { BASE_HEIGHT, BASE_SPEED, BASE_WIDTH, COIN_FIGURE } from './constants'
+import { BASE_HEIGHT, BASE_WIDTH } from './constants'
 
 export class Menu {
   constructor(app, x, y, text) {
@@ -25,7 +25,7 @@ export class Menu {
     this.menuText.y = BASE_HEIGHT / 2 - this.menuText.height / 2
     this.root.interactive = true
     this.menuText.interactive = true
-    
+
     app.stage.addChild(this.root)
     this.root.addChild(this.menuText)
   }
