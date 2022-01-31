@@ -6,6 +6,7 @@ export class Coin {
   constructor(container, isLeft) {
     this.root = new Graphics()
     this.ticker = new Ticker(50)
+    this.scale = 0
     for (let i = 0; i < COIN_FIGURE.length; i++) {
       for (let j = 0; j <= COIN_FIGURE[i].length; j++) {
         if (COIN_FIGURE[i][j] === 1) {
@@ -22,6 +23,19 @@ export class Coin {
   }
   update(dt) {
     this.root.y += this._speed * dt
+
+    this.ticker.update(() => {
+      switch (this.scale) {
+        case 0:
+          this.root.scale.set(0.75)
+          this.scale += 1
+          break
+          case 1:
+          this.root.scale.set(1)
+          this.scale -= 1
+          break
+      }
+    })
   }
   set speed(value) {
     this._speed = value 
