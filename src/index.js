@@ -127,6 +127,7 @@ ticker.add((delta) => {
 
     enemies = enemies.filter((enemy) => {
       enemy.update(delta)
+      enemy.speed = speed
       if (enemy.root.y > BASE_HEIGHT + enemy.root.height / 2) {
         enemy.destroy()
         scoreCount += 100
@@ -173,6 +174,7 @@ ticker.add((delta) => {
 
     coins = coins.filter((coin) => {
       coin.update(delta)
+      coin.speed = speed
       if (coin.root.y > BASE_HEIGHT) {
         coin.destroy()
         return false
@@ -189,6 +191,7 @@ ticker.add((delta) => {
 
     mushrooms = mushrooms.filter((mushroom) => {
       mushroom.update(delta)
+      mushroom.speed = speed
       if (checkForCollision(mushroom.root, hero.root, 0)) {
         if (hero.isCollision) {
           mushroom.destroy()
