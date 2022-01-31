@@ -23,7 +23,6 @@ export class Menu {
     this.menuText.y = BASE_HEIGHT / 2 - this.menuText.height / 2
     this.container.interactive = true
     this.root.interactive = true
-    this.menuText.interactive = true
 
     this.root.addChild(this.menuText)
     this.container.addChild(this.root)
