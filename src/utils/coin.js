@@ -30,7 +30,7 @@ export class Coin {
           this.root.scale.set(0.75)
           this.scale += 1
           break
-          case 1:
+        case 1:
           this.root.scale.set(1)
           this.scale -= 1
           break
@@ -38,7 +38,7 @@ export class Coin {
     })
   }
   set speed(value) {
-    this._speed = value 
+    this._speed = value
   }
   destroy() {
     this.root.clear()

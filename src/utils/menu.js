@@ -1,13 +1,13 @@
-import { Graphics, Text, TextStyle } from 'pixi.js'
+import { Container, Graphics, Text, TextStyle } from 'pixi.js'
 import { BASE_HEIGHT, BASE_WIDTH } from './constants'
 
 export class Menu {
   constructor(app, x, y, text) {
     this.root = new Graphics()
+    this.container = new Container()
     this.root.x = x
     this.root.y = y
     this.text = text
-    this.isStarted = false
     this.app = app
     this.root.beginFill(0xb2beb2)
     this.root.drawRect(this.root.x, this.root.y, BASE_WIDTH, BASE_HEIGHT)
@@ -23,11 +23,13 @@ export class Menu {
     this.menuText = new Text(this.text, this.style)
     this.menuText.x = BASE_WIDTH / 2 - this.menuText.width / 2
     this.menuText.y = BASE_HEIGHT / 2 - this.menuText.height / 2
+    this.container.interactive = true
     this.root.interactive = true
     this.menuText.interactive = true
 
-    app.stage.addChild(this.root)
     this.root.addChild(this.menuText)
+    this.container.addChild(this.root)
+    app.stage.addChild(this.container)
   }
   recreate() {
     this.app.stage.removeChild(this.root)

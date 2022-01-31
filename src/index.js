@@ -74,9 +74,8 @@ function createHero() {
 createHero()
 let menu = new Menu(app, 0, 0, 'click to start')
 
-menu.root.on('mousedown', () => {
-  menu.destroy()
-  menu.isStarted = true
+menu.container.on('mousedown', () => {
+  menu.container.visible = false
 })
 
 function createEnemy() {
@@ -100,7 +99,7 @@ function createMushroom(isLeft) {
 }
 
 ticker.add((delta) => {
-  if (menu.isStarted) {
+  if (!menu.container.visible) {
     time = time + (1 / 60) * delta
 
     hero.update(delta)
@@ -139,11 +138,10 @@ ticker.add((delta) => {
           ticker.stop()
           progress.destroy()
           hero.destroy()
-          menu.destroy()
           menu = new Menu(app, 0, 0, 'click to start')
-          menu.root.on('mousedown', () => {
+          menu.container.on('mousedown', () => {
             menu.destroy()
-            menu.isStarted = true
+            menu.container.visible = false
           })
           createHero()
           enemies.forEach((enemy) => enemy.destroy())
@@ -236,12 +234,10 @@ ticker.add((delta) => {
     if (hero.isBig) {
       checkUpscale(delta)
     }
-
-    app.stage.addChild(coinsText)
-    app.stage.addChild(scoreText)
-    app.stage.addChild(levelText)
-    if (!menu.isStarted) {
-      menu.recreate()
+    if (!menu.container.visible){
+      app.stage.addChild(coinsText)
+      app.stage.addChild(scoreText)
+      app.stage.addChild(levelText)
     }
     if (progress.isVisible) {
       progress.update()
