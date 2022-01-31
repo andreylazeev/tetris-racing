@@ -133,7 +133,7 @@ ticker.add((delta) => {
         return false
       }
 
-      if (checkForCollision(enemy.root, hero.root, 20)) {
+      if (checkForCollision(enemy.root, hero.root, !hero.isBig ? 20: 0)) {
         if (hero.isCollision) {
           ticker.stop()
           progress.destroy()
@@ -215,9 +215,9 @@ ticker.add((delta) => {
     if (enemies[enemies.length - 1].root.y - 220 >= 0) {
       const enemy = createEnemy()
       const random = Math.random()
-      if (random < 0.5) {
+      if (false) {
         createCoin(enemy.isLeft)
-      } else if (random < 0.1) {
+      } else if (random < 0.9) {
         createMushroom(enemy.isLeft)
       }
       return true
