@@ -28,10 +28,4 @@ export class Menu {
     this.container.addChild(this.root)
     app.stage.addChild(this.container)
   }
-  recreate() {
-    this.app.stage.removeChild(this.root)
-    this.app.stage.removeChild(this.menuText)
-    this.app.stage.addChild(this.root)
-    this.app.stage.addChild(this.menuText)
-  }
 }

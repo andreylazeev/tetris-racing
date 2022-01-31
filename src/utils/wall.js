@@ -3,14 +3,13 @@ import { CELL_SIZE, WALL_FIGURE } from './constants'
 import { Ticker } from './ticker'
 
 export class Wall {
-  constructor(app, x, y, speed) {
+  constructor(container, x, y, speed) {
     this.root = new Graphics()
     this.root.x = x
     this.root.y = y
     this.speed = speed
     this.isCollision = true
     this.isBig = false
-    this.app = app
     this.scale = 0
     this.ticker = new Ticker(50)
     for (let i = 0; i < WALL_FIGURE.length; i++) {
@@ -35,12 +34,7 @@ export class Wall {
         }
       }
     }
-    app.stage.addChild(this.root)
-  }
-
-  recreate() {
-    this.app.stage.removeChild(this.root)
-    this.app.stage.addChild(this.root)
+    container.addChild(this.root)
   }
 
   update() {
@@ -60,6 +54,5 @@ export class Wall {
 
   destroy() {
     this.root.clear()
-    this.app.stage.removeChild(this.root)
   }
 }

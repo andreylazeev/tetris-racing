@@ -20,6 +20,7 @@ let coinsCount = 0
 let level = 0
 let prevCount = 0
 let scoreCount = 0
+let isGameOver = false
 
 const style = new PIXI.TextStyle({
   fontFamily: 'Arial',
@@ -71,11 +72,13 @@ app.stage.addChild(liveLayer)
 function createHero() {
   hero = new Car(liveLayer, true, true)
 }
-createHero()
 let menu = new Menu(app, 'click to start')
 
 menu.container.on('mousedown', () => {
+  isGameOver = false
+  liveLayer.visible = true
   menu.container.visible = false
+  createHero()
 })
 
 function createEnemy() {
@@ -98,6 +101,25 @@ function createMushroom(isLeft) {
   return mushroom
 }
 
+function stopGame () {
+  progress.destroy()
+  hero.destroy()
+  menu.container.visible = true
+  liveLayer.visible = false
+  liveLayer.removeChildren()
+  coinsCount = 0
+  scoreCount = 0
+  level = 0
+  speed = BASE_SPEED
+  enemies = []
+  coins = []
+  mushrooms = []
+  walls = []
+  coinsText.text = `coins: 0`
+  scoreText.text = `score: 0`
+  levelText.text = `lap: 0`
+}
+
 ticker.add((delta) => {
   if (!menu.container.visible) {
     time = time + (1 / 60) * delta
@@ -108,16 +130,32 @@ ticker.add((delta) => {
     }
 
     if (!walls.length) {
-      const wall = new Wall(app, 0, 0, 1)
-      const wall2 = new Wall(app, BASE_WIDTH - calcCells(1), 0, 1)
+      const wall = new Wall(liveLayer, 0, 0, 1)
+      const wall2 = new Wall(liveLayer, BASE_WIDTH - calcCells(1), 0, 1)
       walls.push(wall)
       walls.push(wall2)
     }
 
     walls.forEach((wall) => {
       if (walls[walls.length - 1].root.y + walls[walls.length - 1].root.height <= BASE_HEIGHT) {
-        const wall = new Wall(app,0,walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + calcCells(1) - SEPARATOR,1)
-        const wall2 = new Wall(app,BASE_WIDTH - calcCells(1),walls[walls.length - 1].root.y + walls[walls.length - 1].root.height + calcCells(1) - SEPARATOR,1)
+        const wall = new Wall(
+          liveLayer,
+          0,
+          walls[walls.length - 1].root.y +
+            walls[walls.length - 1].root.height +
+            calcCells(1) -
+            SEPARATOR,
+          1
+        )
+        const wall2 = new Wall(
+          liveLayer,
+          BASE_WIDTH - calcCells(1),
+          walls[walls.length - 1].root.y +
+            walls[walls.length - 1].root.height +
+            calcCells(1) -
+            SEPARATOR,
+          1
+        )
         walls.push(wall)
         walls.push(wall2)
       }
@@ -135,30 +173,7 @@ ticker.add((delta) => {
 
       if (checkForCollision(enemy.root, hero.root, 0)) {
         if (hero.isCollision) {
-          ticker.stop()
-          progress.destroy()
-          hero.destroy()
-          menu = new Menu(app, 'click to restart')
-          menu.container.on('mousedown', () => {
-            menu.container.visible = false
-          })
-          createHero()
-          enemies.forEach((enemy) => enemy.destroy())
-          coins.forEach((coin) => coin.destroy())
-          mushrooms.forEach((mushroom) => mushroom.destroy())
-          walls.forEach((wall) => wall.destroy())
-          coinsCount = 0
-          scoreCount = 0
-          level = 0
-          speed = BASE_SPEED
-          enemies = []
-          coins = []
-          mushrooms = []
-          walls = []
-          coinsText.text = `coins: 0`
-          scoreText.text = `score: 0`
-          levelText.text = `lap: 0`
-          ticker.start()
+          isGameOver = true
         } else {
           enemy.destroy()
           scoreCount += 100
@@ -204,7 +219,7 @@ ticker.add((delta) => {
           return false
         }
       }
-      if (mushroom.root.y > BASE_HEIGHT) {
+      if (mushroom.root.y > BASE_HEIGHT + (mushroom.root.height / 2)) {
         mushroom.destroy()
         return false
       }
@@ -233,16 +248,19 @@ ticker.add((delta) => {
     if (hero.isBig) {
       checkUpscale(delta)
     }
-    if (!menu.container.visible){
-      app.stage.addChild(coinsText)
-      app.stage.addChild(scoreText)
-      app.stage.addChild(levelText)
+    if (!menu.container.visible) {
+      liveLayer.addChild(coinsText)
+      liveLayer.addChild(scoreText)
+      liveLayer.addChild(levelText)
     }
     if (progress.isVisible) {
       progress.update()
     }
     if (progress) {
       progress.recreate()
+    }
+    if (isGameOver) {
+      stopGame()
     }
   }
 })
@@ -251,7 +269,6 @@ ticker.start()
 
 const checkUpscale = (delta) => {
   upscaleTime = upscaleTime + (1 / 60) * delta
-  console.log(upscaleTime)
   if (!progress.isVisible) {
     progress.draw()
   }
