@@ -73,11 +73,13 @@ function createHero() {
   hero = new Car(liveLayer, true, true)
 }
 let menu = new Menu(app, 'click to start')
+let wall
 
 menu.container.on('mousedown', () => {
   isGameOver = false
   liveLayer.visible = true
   menu.container.visible = false
+  wall = new Wall(liveLayer, speed)
   createHero()
 })
 
@@ -120,47 +122,17 @@ function stopGame () {
   levelText.text = `lap: 0`
 }
 
+
+
 ticker.add((delta) => {
   if (!menu.container.visible) {
+    wall.update()
     time = time + (1 / 60) * delta
 
     hero.update(delta)
     if (!enemies.length) {
       createEnemy()
     }
-
-    if (!walls.length) {
-      const wall = new Wall(liveLayer, 0, 0, 1)
-      const wall2 = new Wall(liveLayer, BASE_WIDTH - calcCells(1), 0, 1)
-      walls.push(wall)
-      walls.push(wall2)
-    }
-
-    walls.forEach((wall) => {
-      if (walls[walls.length - 1].root.y + walls[walls.length - 1].root.height <= BASE_HEIGHT) {
-        const wall = new Wall(
-          liveLayer,
-          0,
-          walls[walls.length - 1].root.y +
-            walls[walls.length - 1].root.height +
-            calcCells(1) -
-            SEPARATOR,
-          1
-        )
-        const wall2 = new Wall(
-          liveLayer,
-          BASE_WIDTH - calcCells(1),
-          walls[walls.length - 1].root.y +
-            walls[walls.length - 1].root.height +
-            calcCells(1) -
-            SEPARATOR,
-          1
-        )
-        walls.push(wall)
-        walls.push(wall2)
-      }
-      wall.update()
-    })
 
     enemies = enemies.filter((enemy) => {
       enemy.update(delta)
