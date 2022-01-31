@@ -34,9 +34,4 @@ export class Menu {
     this.app.stage.addChild(this.root)
     this.app.stage.addChild(this.menuText)
   }
-
-  destroy() {
-    this.app.stage.removeChild(this.menuText)
-    this.app.stage.removeChild(this.root)
-  }
 }

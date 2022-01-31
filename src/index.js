@@ -140,7 +140,6 @@ ticker.add((delta) => {
           hero.destroy()
           menu = new Menu(app, 'click to restart')
           menu.container.on('mousedown', () => {
-            menu.destroy()
             menu.container.visible = false
           })
           createHero()
