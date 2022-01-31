@@ -41,14 +41,14 @@ const levelText = new PIXI.Text(`lap: 0`, style)
 levelText.x = 50
 levelText.y = 90
 
-function checkForCollision(a, b, offsetY) {
+function checkForCollision(a, b) {
   let aBox = a.getBounds()
   let bBox = b.getBounds()
 
   return (
     aBox.x + aBox.width > bBox.x &&
     aBox.x < bBox.x + bBox.width &&
-    aBox.y - offsetY + aBox.height - offsetY > bBox.y &&
+    aBox.y + aBox.height > bBox.y &&
     aBox.y < bBox.y + bBox.height
   )
 }
@@ -133,7 +133,7 @@ ticker.add((delta) => {
         return false
       }
 
-      if (checkForCollision(enemy.root, hero.root, !hero.isBig ? 20: 0)) {
+      if (checkForCollision(enemy.root, hero.root, 0)) {
         if (hero.isCollision) {
           ticker.stop()
           progress.destroy()
