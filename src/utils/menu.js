@@ -2,15 +2,13 @@ import { Container, Graphics, Text, TextStyle } from 'pixi.js'
 import { BASE_HEIGHT, BASE_WIDTH } from './constants'
 
 export class Menu {
-  constructor(app, x, y, text) {
+  constructor(app, text) {
     this.root = new Graphics()
     this.container = new Container()
-    this.root.x = x
-    this.root.y = y
     this.text = text
     this.app = app
     this.root.beginFill(0xb2beb2)
-    this.root.drawRect(this.root.x, this.root.y, BASE_WIDTH, BASE_HEIGHT)
+    this.root.drawRect(0, 0, BASE_WIDTH, BASE_HEIGHT)
     this.root.endFill()
 
     this.style = new TextStyle({

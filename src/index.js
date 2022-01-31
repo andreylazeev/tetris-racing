@@ -72,7 +72,7 @@ function createHero() {
   hero = new Car(liveLayer, true, true)
 }
 createHero()
-let menu = new Menu(app, 0, 0, 'click to start')
+let menu = new Menu(app, 'click to start')
 
 menu.container.on('mousedown', () => {
   menu.container.visible = false
@@ -138,7 +138,7 @@ ticker.add((delta) => {
           ticker.stop()
           progress.destroy()
           hero.destroy()
-          menu = new Menu(app, 0, 0, 'click to restart')
+          menu = new Menu(app, 'click to restart')
           menu.container.on('mousedown', () => {
             menu.destroy()
             menu.container.visible = false
