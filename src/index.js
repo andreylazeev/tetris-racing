@@ -8,7 +8,7 @@ import { Mushroom } from './utils/mushroom'
 import { Progress } from './utils/progressbar'
 import { Wall } from './utils/wall'
 import { randomBool } from './utils/random'
-import { Container, Graphics } from 'pixi.js'
+import { Container } from 'pixi.js'
 const app = new PIXI.Application({
   width: BASE_WIDTH,
   height: BASE_HEIGHT,
