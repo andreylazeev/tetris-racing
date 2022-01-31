@@ -231,7 +231,7 @@ ticker.add((delta) => {
       const random = Math.random()
       if (random < 0.5) {
         createCoin(enemy.isLeft)
-      } else if (random < 0.1) {
+      } else if (random < 0.6) {
         createMushroom(enemy.isLeft)
       }
       return true
