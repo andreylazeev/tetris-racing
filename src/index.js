@@ -122,8 +122,6 @@ function stopGame () {
   levelText.text = `lap: 0`
 }
 
-
-
 ticker.add((delta) => {
   if (!menu.container.visible) {
     wall.update()
